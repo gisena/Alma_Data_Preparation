@@ -1,9 +1,13 @@
 #!/usr/local/bin/perl
 #
-# addSubfield.pl: add subfield 9LOCAL to a specific MARC field
+# addSubfield.pl: add subfield  to a specific MARC field
 #
-# usage:	 $BIN/addSubfield.pl  <INPTAG> <OUTPUTFILE> <INPUTFILE>
-#
+# usage:	 $BIN/addSubfield.pl <INPTAG> <INPSUBF> <INPFILE> > <OUTFILE>
+#		 e.g.:  $BIN/addSubfield.pl 500 '|9LOCAL' input.mrc > output.mrc
+#                <INPTAG> - source tag to get subfield <INPSUBF>
+#                <INPSUBF> - subfield to be added
+#                <INPFILE> - source marc-format file
+#   
 $DEBUG=0;
 
 use lib '/voyager/wrlcdb/local/lib';
@@ -11,18 +15,14 @@ require 'marc.pm';
 
 # query parameters
 $mfield = shift;
-#$OUTDIR  = shift;
-$OUTFILE = shift;
-
-print STDERR "\tSplitting files into $MAXRECORDS records each\n" if $DEBUG && $MAXRECORDS;
+$mtext = shift;
 
 # MARC file record delimiter
 $/ = chr(29);       # (0x1d)
 
 $cnt = 0;
 $non = 0;
-open (OUT, "> $OUTFILE")
-	|| die "can't open $OUTFILE\nscript aborted";
+
 while (<>) {
 	$cnt++;
 	@marc = &marc2array($_);
@@ -32,10 +32,9 @@ while (<>) {
 			print STDERR "in $i =>$marc[$i]<=\n" if $DEBUG;
 			my $field = substr($marc[$i],7);		# strip field tag
 			$field =~ s/^\s+//; $field =~ s/\s+$//;		# trim spaces
-		        $localStr='|9LOCAL';	
-			if (index($field, $localStr) < 0) {
+			if (index($field, $mtext) < 0) {
 				@subfields = split(/\|/, $field);		# split subfields
-                                substr($marc[$i],7) .= '|9LOCAL';
+                                substr($marc[$i],7) .= $mtext;
 			        print STDERR "out $i =>$marc[$i]<=\n" if $DEBUG;
                         }
 			else { # already preserved
@@ -45,13 +44,8 @@ while (<>) {
 	} else {
 		$non++;
 	}
-
-	print OUT &array2marc(@marc);
+	print &array2marc(@marc);
 }
-close OUT;
 
-
-print STDERR "$cnt MARC records processed\n";
-print STDERR "$non records had no $mfield tags to update.\n" if $non;
-print STDERR "\noutput in $OUTFILE";
-print STDERR ".\n";
+print STDERR "$cnt MARC records processed\n" if $DEBUG;
+print STDERR "$non records had no $mfield tags to update.\n" if $non && $DEBUG;

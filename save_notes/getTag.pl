@@ -1,7 +1,10 @@
 #!/usr/local/bin/perl
-# getTag.pl
-# retrieve bibids of bib records that contain tag for a given libid
-# usage: $BIN/getTag.pl <tag> <libid> 
+#
+# getTag.pl : retrieve bibids of all bib records that contain tag for a given libid
+#
+# usage: $BIN/getTag.pl <INPTAG> <LIBNAME> > <list of bib_ids with INPTAG>
+#        <INPTAG> - input tag constraint
+#        <LIBNAME> - 2 letter name of library bibids to search for
 #
 
 # import the MARC perl library
@@ -27,23 +30,6 @@ close UPWFILE;
 open (UNMFILE, "/voyager/wrlcdb/local/lib/dbunm");
 $DBUSER = <UNMFILE>; chomp $DBUSER;
 close UNMFILE;
-
-#$rptpath = "/home/voyager/tmp/${lib}_$tag.txt";
-#if (open(REPORT, ">$rptpath")) {
-#        $rpth = *REPORT;
-#} else {
-#        print STDERR "Warning: can't open $rptpath, using STDOUT\n\n";
-#        $rpth = *STDOUT;
-#}
-
-#print $rpth "";
-
-#
-# begin and end dates
-#
-# latest request:
-$rptdate = `date +"%b %d, %Y"`;
-$tmpdate = `date +"%b%d%Y"`;
 
 #
 # SQL statement to select bibs suppressed from CUA
@@ -101,7 +87,6 @@ while(($bibid) = $bibh->fetchrow_array) {
 ###			$dot = 0;
 ###		}
 }
-###print STDERR "\n";
 $t1 = new Benchmark;
 
 $bibh->finish; $dbh->disconnect;

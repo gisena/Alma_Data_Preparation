@@ -1,9 +1,12 @@
 #!/usr/local/bin/perl
 #
-# addTag.pl: add subfield 9LOCAL to a specific MARC field
+# addTag.pl: copy contents of MARC field <INPTAG> into a new MARC field <OUTTAG> and add subfield 9LOCAL
 #
-# usage:	$BIN/addTag.pl <INPTAG> <OUTTAG> <OUTPUTFILE> <INPUTFILE>
-#
+# usage:	$BIN/addTag.pl <INPTAG> <OUTTAG> <INPFILE> >  <OUTFILE>
+#               <INPTAG> - source MARC field to be copied
+#               <OUTTAG> - New target MARC field copied from <INPTAG> with added subfield 9LOCAL
+#               <INPFILE) - source MARC format file
+# 
 $DEBUG=0;
 
 use lib '/voyager/wrlcdb/local/lib';
@@ -12,17 +15,13 @@ require 'marc.pm';
 # query parameters
 $mfield = shift;
 $lfield = shift;
-$OUTFILE = shift;
-
-print STDERR "\tSplitting files into $MAXRECORDS records each\n" if $DEBUG && $MAXRECORDS;
 
 # MARC file record delimiter
 $/ = chr(29);       # (0x1d)
 
 $cnt = 0;
 $non = 0;
-open (OUT, "> $OUTFILE")
-	|| die "can't open $OUTFILE\nscript aborted";
+
 while (<>) {
 	$cnt++;
 	@marc = &marc2array($_);
@@ -48,11 +47,9 @@ while (<>) {
         @NEWMARC = sort @marc;
         unshift @NEWMARC, $ldr;
 
-	print OUT &array2marc(@NEWMARC);
+	print &array2marc(@NEWMARC);
 }
 close OUT;
 
-print STDERR "$cnt MARC records processed\n";
-print STDERR "$non records had no $mfield tag(s) to copy to $lfield tag(s).\n" if $non;
-print STDERR "\noutput in $OUTFILE";
-print STDERR ".\n";
+print STDERR "$cnt MARC records processed\n"  if $DEBUG;
+print STDERR "$non records had no $mfield tag(s) to copy to $lfield tag(s).\n" if $non  && $DEBUG;
