@@ -1,0 +1,40 @@
+
+select 
+mfhd_id||'|'||
+count(*) 
+from 
+mfhd_item 
+where mfhd_id in 
+(<list of MFHD_id taken from results of SQL_get_mfhdId_mismatch query> )
+group by mfhd_id;
+
+
+open results in excel and filter for count > 1
+###using only mfhd_id with count > 1; meaning multivolume set
+
+open results in excel and filter for count = 1
+###using only mfhd_id with count = 1; meaning single volume set
+
+
+select
+m.mfhd_id||'|'||
+loc.location_id||'|'||
+loc.location_code||'|'||
+i.item_id||'|'||
+y.item_enum||'|'||
+perm.location_id||'|'||
+perm.location_code||'|'||
+i.temp_location
+from
+wrlcdb.location perm,
+wrlcdb.location loc,
+wrlcdb.mfhd_item y,
+wrlcdb.item i,
+wrlcdb.mfhd_master m
+where
+i.perm_location=perm.location_id
+and loc.location_id=m.location_id
+and m.mfhd_id=y.mfhd_id
+and i.item_id=y.item_id
+and m.mfhd_id in ( 
+< list from above query >);

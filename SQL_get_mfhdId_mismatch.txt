@@ -1,0 +1,40 @@
+select
+i.item_id||'|'||
+perm.location_id||'|'||
+perm.location_code||'|'||
+i.temp_location||'|'||
+m.mfhd_id||'|'||
+loc.location_id||'|'||
+loc.location_code
+from
+wrlcdb.location perm,
+wrlcdb.location loc,
+wrlcdb.mfhd_item y,
+wrlcdb.bib_item x,
+wrlcdb.bib_master b,
+wrlcdb.item i,
+wrlcdb.mfhd_master m
+where
+i.perm_location=perm.location_id
+and loc.location_id=m.location_id
+and m.mfhd_id=y.mfhd_id
+and i.item_id=y.item_id
+and x.item_id=y.item_id
+and b.bib_id=x.bib_id
+and perm.location_id <> loc.location_id
+and (perm.LOCATION_CODE not like 'wr%' 
+And  loc.location_code not like 'wr%')
+and b.library_id=7
+and b.suppress_in_opac='N'
+
+2|AU
+3|CU
+4|DC
+5|GA
+6|GM
+14|GT
+7|GW
+22|HU
+9|MU
+ in (2,3,4,5,6,7,14,9,22);
+
