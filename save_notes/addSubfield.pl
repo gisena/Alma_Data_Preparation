@@ -33,8 +33,8 @@ while (<>) {
 			my $field = substr($marc[$i],7);		# strip field tag
 			$field =~ s/^\s+//; $field =~ s/\s+$//;		# trim spaces
 			if (index($field, $mtext) < 0) {
-				@subfields = split(/\|/, $field);		# split subfields
-                                substr($marc[$i],7) .= $mtext;
+				@subfields = split(/\|/, $field);	# split subfields
+                                substr($marc[$i],7) .= $mtext;          # e.g. $mtext='|9LOCAL'
 			        print STDERR "out $i =>$marc[$i]<=\n" if $DEBUG;
                         }
 			else { # already preserved
